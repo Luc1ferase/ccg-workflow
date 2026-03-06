@@ -102,9 +102,8 @@ const zhCN = {
       sequential: '顺序模式 - 依次调用模型',
     },
     models: {
-      codex: 'Codex - 擅长后端逻辑、算法、调试',
-      gemini: 'Gemini - 擅长前端UI、CSS、组件设计',
-      claude: 'Claude - 擅长编排、重构、文档生成',
+      codex: 'Codex (gpt-5.4) - 擅长后端逻辑、算法、调试',
+      claude: 'Claude (claude-opus-4-6) - 擅长前端 UI、CSS、组件设计与重构',
     },
     workflows: {
       dev: '完整开发工作流 (/ccg:dev)',
@@ -153,7 +152,7 @@ const zhCN = {
       hint: '更多信息请运行: npx ccg --help',
       descriptions: {
         dev: '完整六阶段开发工作流',
-        frontend: '前端任务 → Gemini',
+        frontend: '前端任务 → Claude',
         backend: '后端任务 → Codex',
         review: '双模型代码审查',
         analyze: '双模型技术分析',
@@ -273,9 +272,8 @@ const en = {
       sequential: 'Sequential - Call models one by one',
     },
     models: {
-      codex: 'Codex - Backend logic, algorithms, debugging',
-      gemini: 'Gemini - Frontend UI, CSS, component design',
-      claude: 'Claude - Orchestration, refactoring, documentation',
+      codex: 'Codex (gpt-5.4) - Backend logic, algorithms, debugging',
+      claude: 'Claude (claude-opus-4-6) - Frontend UI, CSS, component design, refactoring',
     },
     workflows: {
       dev: 'Full development workflow (/ccg:dev)',
@@ -324,7 +322,7 @@ const en = {
       hint: 'For more information, run: npx ccg --help',
       descriptions: {
         dev: 'Complete 6-phase development workflow',
-        frontend: 'Frontend tasks → Gemini',
+        frontend: 'Frontend tasks → Claude',
         backend: 'Backend tasks → Codex',
         review: 'Dual-model code review',
         analyze: 'Dual-model technical analysis',

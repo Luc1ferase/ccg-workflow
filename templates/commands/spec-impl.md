@@ -1,4 +1,4 @@
----
+﻿---
 description: '按规范执行 + 多模型协作 + 归档'
 ---
 <!-- CCG:SPEC:IMPL:START -->
@@ -9,7 +9,7 @@ description: '按规范执行 + 多模型协作 + 归档'
 - Minimize documentation—prefer self-explanatory code over comments.
 
 **Guardrails**
-- **NEVER** apply Codex/Gemini prototypes directly—all outputs are reference only.
+- **NEVER** apply Codex/CLAUDE prototypes directly—all outputs are reference only.
 - **MANDATORY**: Request `unified diff patch` format from external models; they have zero write permission.
 - Keep implementation strictly within `tasks.md` scope—no scope creep.
 - Refer to `openspec/config.yaml` for conventions.
@@ -30,14 +30,14 @@ description: '按规范执行 + 多模型协作 + 归档'
    - Announce: "Implementing Phase X: [task group name]"
 
 4. **Route Tasks to Appropriate Model**
-   - **Route A: Gemini** — Frontend/UI/styling (CSS, React, Vue, HTML, components)
+   - **Route A: CLAUDE** — Frontend/UI/styling (CSS, React, Vue, HTML, components)
    - **Route B: Codex** — Backend/logic/algorithm (API, data processing, business logic)
 
    **工作目录**：`{{WORKDIR}}` 替换为目标工作目录的绝对路径。如果用户通过 `/add-dir` 添加了多个工作区，先确定任务相关的工作区。
 
    For each task:
    ```
-   codeagent-wrapper --backend <codex|gemini> --gemini-model gemini-3.1-pro-preview - "{{WORKDIR}}" <<'EOF'
+   codeagent-wrapper --backend <codex|CLAUDE> - "{{WORKDIR}}" <<'EOF'
    TASK: <task description from tasks.md>
    CONTEXT: <relevant code context>
    CONSTRAINTS: <constraints from spec>
@@ -45,7 +45,7 @@ description: '按规范执行 + 多模型协作 + 归档'
    EOF
    ```
 
-   Note: `--gemini-model` parameter is only used when `--backend gemini` is specified.
+   Note: `--CLAUDE-model` parameter is only used when `--backend CLAUDE` is specified.
 
 5. **Rewrite Prototype to Production Code**
    Upon receiving diff patch, **NEVER apply directly**. Rewrite by:
@@ -65,7 +65,7 @@ description: '按规范执行 + 多模型协作 + 归档'
    If issues found, make targeted corrections.
 
 7. **Multi-Model Review (PARALLEL)**
-   - **CRITICAL**: You MUST launch BOTH Codex AND Gemini in a SINGLE message with TWO Bash tool calls.
+   - **CRITICAL**: You MUST launch BOTH Codex AND CLAUDE in a SINGLE message with TWO Bash tool calls.
    - **DO NOT** call one model first and wait. Launch BOTH simultaneously with `run_in_background: true`.
 
    **Step 7.1**: In ONE message, make TWO parallel Bash calls:
@@ -80,20 +80,20 @@ description: '按规范执行 + 多模型协作 + 归档'
    })
    ```
 
-   **SECOND Bash call (Gemini) - IN THE SAME MESSAGE**:
+   **SECOND Bash call (CLAUDE) - IN THE SAME MESSAGE**:
    ```
    Bash({
-     command: "~/.claude/bin/codeagent-wrapper --backend gemini --gemini-model gemini-3.1-pro-preview - \"{{WORKDIR}}\" <<'EOF'\nReview the implementation changes:\n- Maintainability: readability, complexity\n- Patterns: consistency with project style\n- Integration: cross-module impacts\nOUTPUT: JSON with findings\nEOF",
+     command: "~/.claude/bin/codeagent-wrapper --backend CLAUDE - \"{{WORKDIR}}\" <<'EOF'\nReview the implementation changes:\n- Maintainability: readability, complexity\n- Patterns: consistency with project style\n- Integration: cross-module impacts\nOUTPUT: JSON with findings\nEOF",
      run_in_background: true,
      timeout: 300000,
-     description: "Gemini: maintainability/patterns review"
+     description: "CLAUDE: maintainability/patterns review"
    })
    ```
 
    **Step 7.2**: After BOTH Bash calls return task IDs, wait for results with TWO TaskOutput calls:
    ```
    TaskOutput({ task_id: "<codex_task_id>", block: true, timeout: 600000 })
-   TaskOutput({ task_id: "<gemini_task_id>", block: true, timeout: 600000 })
+   TaskOutput({ task_id: "<CLAUDE_task_id>", block: true, timeout: 600000 })
    ```
 
    Address any critical findings before proceeding.
@@ -124,3 +124,4 @@ Implementation is complete when:
 - [ ] Side-effect review confirmed no regressions
 - [ ] Change archived successfully
 <!-- CCG:SPEC:IMPL:END -->
+

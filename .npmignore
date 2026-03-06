@@ -1,7 +1,6 @@
 # 排除未测试的文件和目录
 
 # 未测试的提示词
-templates/prompts/gemini/architect.md
 
 # 未测试的示例
 templates/examples/

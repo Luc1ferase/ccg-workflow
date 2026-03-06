@@ -12,13 +12,13 @@ import { migrateToV1_4_0, needsMigration } from '../utils/migration'
 
 export async function init(options: InitOptions = {}): Promise<void> {
   console.log()
-  console.log(ansis.cyan.bold(`  CCG - Claude + Codex + Gemini`))
+  console.log(ansis.cyan.bold(`  CCG - Claude + Codex`))
   console.log(ansis.gray(`  多模型协作开发工作流`))
   console.log()
 
   // Fixed configuration
   const language: SupportedLang = 'zh-CN'
-  const frontendModels: ModelType[] = ['gemini']
+  const frontendModels: ModelType[] = ['claude']
   const backendModels: ModelType[] = ['codex']
   const mode: CollaborationMode = 'smart'
   const selectedWorkflows = getAllCommandIds()
@@ -233,11 +233,11 @@ export async function init(options: InitOptions = {}): Promise<void> {
     }
   }
 
-  // Build routing config (fixed: Gemini frontend, Codex backend)
+  // Build routing config (fixed: Claude frontend, Codex backend)
   const routing: ModelRouting = {
     frontend: {
       models: frontendModels,
-      primary: 'gemini',
+      primary: 'claude',
       strategy: 'fallback',
     },
     backend: {
@@ -246,7 +246,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
       strategy: 'fallback',
     },
     review: {
-      models: ['codex', 'gemini'],
+      models: ['codex', 'claude'],
       strategy: 'parallel',
     },
     mode,
@@ -257,7 +257,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
   console.log(ansis.yellow('━'.repeat(50)))
   console.log(ansis.bold(`  ${i18n.t('init:summary.title')}`))
   console.log()
-  console.log(`  ${ansis.cyan('模型路由')}  ${ansis.green('Gemini')} (前端) + ${ansis.blue('Codex')} (后端)`)
+  console.log(`  ${ansis.cyan('模型路由')}  ${ansis.green('Claude')} (前端) + ${ansis.blue('Codex')} (后端)`)
   console.log(`  ${ansis.cyan('命令数量')}  ${ansis.yellow(selectedWorkflows.length.toString())} 个`)
   console.log(`  ${ansis.cyan('MCP 工具')}  ${(mcpProvider === 'ace-tool' || mcpProvider === 'ace-tool-rs') ? (aceToolToken ? ansis.green(mcpProvider) : ansis.yellow(`${mcpProvider} (待配置)`)) : ansis.gray('跳过')}`)
   console.log(`  ${ansis.cyan('Web UI')}    ${liteMode ? ansis.gray('禁用') : ansis.green('启用')}`)
@@ -418,7 +418,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
       if (!settings.permissions.allow)
         settings.permissions.allow = []
       const wrapperPerms = [
-        'Bash(~/.claude/bin/codeagent-wrapper --backend gemini*)',
+        'Bash(~/.claude/bin/codeagent-wrapper --backend claude*)',
         'Bash(~/.claude/bin/codeagent-wrapper --backend codex*)',
       ]
       for (const perm of wrapperPerms) {

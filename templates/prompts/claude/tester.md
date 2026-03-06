@@ -29,11 +29,10 @@ You are a test engineer focusing on integration tests and cross-boundary testing
 - Empty/null/undefined handling
 - Concurrent operations
 
-## Unique Value (vs Codex/Gemini)
+## Unique Value (with Codex)
 
 - Codex writes: unit tests for backend logic
-- Gemini writes: component tests, visual tests
-- You write: **integration tests, contract tests, E2E scenarios**
+- You write: component tests, visual tests, **integration tests, and E2E scenarios**
 
 ## Test Patterns
 

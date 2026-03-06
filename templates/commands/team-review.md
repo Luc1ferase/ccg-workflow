@@ -1,4 +1,4 @@
----
+﻿---
 description: 'Agent Teams 审查 - 双模型交叉审查并行实施的产出，分级处理 Critical/Warning/Info'
 ---
 <!-- CCG:TEAM:REVIEW:START -->
@@ -8,7 +8,7 @@ description: 'Agent Teams 审查 - 双模型交叉审查并行实施的产出，
 - 审查范围严格限于 team-exec 的变更，不扩大范围。
 
 **Guardrails**
-- **MANDATORY**: Codex 和 Gemini 必须都完成审查后才能综合。
+- **MANDATORY**: Codex 和 CLAUDE 必须都完成审查后才能综合。
 - 审查范围限于 `git diff` 的变更，不做范围蔓延。
 - Lead 可以直接修复 Critical 问题（审查阶段允许写代码）。
 
@@ -32,20 +32,20 @@ description: 'Agent Teams 审查 - 双模型交叉审查并行实施的产出，
    })
    ```
 
-   **SECOND Bash call (Gemini) - IN THE SAME MESSAGE**:
+   **SECOND Bash call (CLAUDE) - IN THE SAME MESSAGE**:
    ```
    Bash({
-     command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini {{GEMINI_MODEL_FLAG}}- \"{{WORKDIR}}\" <<'EOF'\nROLE_FILE: ~/.claude/.ccg/prompts/gemini/reviewer.md\n<TASK>\n审查以下变更：\n<git diff 输出或变更文件列表>\n</TASK>\nOUTPUT (JSON):\n{\n  \"findings\": [\n    {\n      \"severity\": \"Critical|Warning|Info\",\n      \"dimension\": \"patterns|maintainability|accessibility|ux|frontend_security\",\n      \"file\": \"path/to/file\",\n      \"line\": 42,\n      \"description\": \"问题描述\",\n      \"fix_suggestion\": \"修复建议\"\n    }\n  ],\n  \"passed_checks\": [\"已验证的检查项\"],\n  \"summary\": \"总体评估\"\n}\nEOF",
+     command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend CLAUDE - \"{{WORKDIR}}\" <<'EOF'\nROLE_FILE: ~/.claude/.ccg/prompts/CLAUDE/reviewer.md\n<TASK>\n审查以下变更：\n<git diff 输出或变更文件列表>\n</TASK>\nOUTPUT (JSON):\n{\n  \"findings\": [\n    {\n      \"severity\": \"Critical|Warning|Info\",\n      \"dimension\": \"patterns|maintainability|accessibility|ux|frontend_security\",\n      \"file\": \"path/to/file\",\n      \"line\": 42,\n      \"description\": \"问题描述\",\n      \"fix_suggestion\": \"修复建议\"\n    }\n  ],\n  \"passed_checks\": [\"已验证的检查项\"],\n  \"summary\": \"总体评估\"\n}\nEOF",
      run_in_background: true,
      timeout: 3600000,
-     description: "Gemini 前端审查"
+     description: "CLAUDE 前端审查"
    })
    ```
 
    **等待结果**:
    ```
    TaskOutput({ task_id: "<codex_task_id>", block: true, timeout: 600000 })
-   TaskOutput({ task_id: "<gemini_task_id>", block: true, timeout: 600000 })
+   TaskOutput({ task_id: "<CLAUDE_task_id>", block: true, timeout: 600000 })
    ```
 
 3. **综合发现**
@@ -78,7 +78,7 @@ description: 'Agent Teams 审查 - 双模型交叉审查并行实施的产出，
 5. **决策门**
    - **Critical > 0**:
      * 展示发现，用 `AskUserQuestion` 询问："立即修复 / 跳过"
-     * 选择修复 → Lead 直接修复（后端问题参考 Codex 建议，前端参考 Gemini 建议）
+     * 选择修复 → Lead 直接修复（后端问题参考 Codex 建议，前端参考 CLAUDE 建议）
      * 修复后重新运行受影响的审查维度
      * 重复直到 Critical = 0
    - **Critical = 0**:
@@ -88,8 +88,9 @@ description: 'Agent Teams 审查 - 双模型交叉审查并行实施的产出，
    - 报告当前上下文使用量。
 
 **Exit Criteria**
-- [ ] Codex + Gemini 审查完成
+- [ ] Codex + CLAUDE 审查完成
 - [ ] 所有发现已综合分级
 - [ ] Critical = 0（已修复或用户确认跳过）
 - [ ] 审查报告已输出
 <!-- CCG:TEAM:REVIEW:END -->
+

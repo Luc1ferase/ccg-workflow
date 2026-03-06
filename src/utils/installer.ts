@@ -28,7 +28,7 @@ const ALL_COMMANDS = [
   'workflow', // 完整6阶段开发工作流
   'plan', // 多模型协作规划（Phase 1-2）
   'execute', // 多模型协作执行（Phase 3-5）
-  'frontend', // 前端专项（Gemini主导）
+  'frontend', // 前端专项（Claude主导）
   'backend', // 后端专项（Codex主导）
   'feat', // 智能功能开发
   'analyze', // 技术分析
@@ -47,7 +47,7 @@ const ALL_COMMANDS = [
   'spec-impl', // 多模型协作实现
   'spec-review', // 归档前多模型审查
   'team-research', // Agent Teams 需求研究（并行探索 → 约束集）
-  'team-plan', // Agent Teams 规划（Lead 调 Codex/Gemini 产出并行计划）
+  'team-plan', // Agent Teams 规划（Lead 调 Codex/Claude 产出并行计划）
   'team-exec', // Agent Teams 并行实施（spawn Builders 并行写代码）
   'team-review', // Agent Teams 审查（双模型交叉审查并行产出）
 ] as const
@@ -95,8 +95,8 @@ const WORKFLOW_CONFIGS: WorkflowConfig[] = [
     commands: ['frontend'],
     defaultSelected: true,
     order: 2,
-    description: '前端专项任务（Gemini主导，更快更精准）',
-    descriptionEn: 'Frontend tasks (Gemini-led, faster)',
+    description: '前端专项任务（Claude主导，更快更精准）',
+    descriptionEn: 'Frontend tasks (Claude-led, faster)',
   },
   {
     id: 'backend',
@@ -315,8 +315,8 @@ const WORKFLOW_CONFIGS: WorkflowConfig[] = [
     commands: ['team-plan'],
     defaultSelected: true,
     order: 2,
-    description: 'Lead 调用 Codex/Gemini 并行分析，产出零决策并行实施计划',
-    descriptionEn: 'Lead orchestrates Codex/Gemini analysis, produces zero-decision parallel plan',
+    description: 'Lead 调用 Codex/Claude 并行分析，产出零决策并行实施计划',
+    descriptionEn: 'Lead orchestrates Codex/Claude analysis, produces zero-decision parallel plan',
   },
   {
     id: 'team-exec',
@@ -399,8 +399,8 @@ export function injectConfigVariables(content: string, config: {
   const routing = config.routing || {}
 
   // Frontend models
-  const frontendModels = routing.frontend?.models || ['gemini']
-  const frontendPrimary = routing.frontend?.primary || 'gemini'
+  const frontendModels = routing.frontend?.models || ['claude']
+  const frontendPrimary = routing.frontend?.primary || 'claude'
   processed = processed.replace(/\{\{FRONTEND_MODELS\}\}/g, JSON.stringify(frontendModels))
   processed = processed.replace(/\{\{FRONTEND_PRIMARY\}\}/g, frontendPrimary)
 
@@ -411,7 +411,7 @@ export function injectConfigVariables(content: string, config: {
   processed = processed.replace(/\{\{BACKEND_PRIMARY\}\}/g, backendPrimary)
 
   // Review models
-  const reviewModels = routing.review?.models || ['codex', 'gemini']
+  const reviewModels = routing.review?.models || ['codex', 'claude']
   processed = processed.replace(/\{\{REVIEW_MODELS\}\}/g, JSON.stringify(reviewModels))
 
   // Routing mode
@@ -459,6 +459,34 @@ export function injectConfigVariables(content: string, config: {
     processed = processed.replace(/\{\{MCP_SEARCH_TOOL\}\}/g, 'mcp__ace-tool__search_context')
     processed = processed.replace(/\{\{MCP_SEARCH_PARAM\}\}/g, 'query')
   }
+
+  return processed
+}
+
+function getModelDisplayName(model: string): string {
+  switch (model) {
+    case 'claude':
+      return 'Claude'
+    case 'codex':
+      return 'Codex'
+    default:
+      return model.charAt(0).toUpperCase() + model.slice(1)
+  }
+}
+
+function normalizeLegacyModelReferences(content: string, routing?: {
+  frontend?: { primary?: string }
+}): string {
+  const frontendPrimary = routing?.frontend?.primary || 'claude'
+  const frontendDisplayName = getModelDisplayName(frontendPrimary)
+
+  let processed = content
+  processed = processed.replace(/\{\{GEMINI_MODEL_FLAG\}\}/g, '')
+  processed = processed.replace(/^.*GEMINI_MODEL_FLAG.*\r?\n?/gm, '')
+  processed = processed.replace(/--gemini-model\s+[^\s]+\s*/g, '')
+  processed = processed.replace(/GEMINI/g, frontendDisplayName.toUpperCase())
+  processed = processed.replace(/Gemini/g, frontendDisplayName)
+  processed = processed.replace(/gemini/g, frontendPrimary)
 
   return processed
 }
@@ -560,9 +588,9 @@ export async function installWorkflows(
   const installConfig = {
     routing: config?.routing || {
       mode: 'smart',
-      frontend: { models: ['gemini'], primary: 'gemini' },
+      frontend: { models: ['claude'], primary: 'claude' },
       backend: { models: ['codex'], primary: 'codex' },
-      review: { models: ['codex', 'gemini'] },
+      review: { models: ['codex', 'claude'] },
     },
     liteMode: config?.liteMode || false,
     mcpProvider: config?.mcpProvider || 'ace-tool',
@@ -604,6 +632,7 @@ export async function installWorkflows(
             // Read template content, inject config variables, replace ~ paths, then write
             let templateContent = await fs.readFile(srcFile, 'utf-8')
             templateContent = injectConfigVariables(templateContent, installConfig)
+            templateContent = normalizeLegacyModelReferences(templateContent, installConfig.routing)
             const processedContent = replaceHomePathsInTemplate(templateContent, installDir)
             await fs.writeFile(destFile, processedContent, 'utf-8')
             result.installedCommands.push(cmd)
@@ -647,6 +676,7 @@ ${workflow.description}
             // Read template content, inject config variables, replace ~ paths, then write
             let templateContent = await fs.readFile(srcFile, 'utf-8')
             templateContent = injectConfigVariables(templateContent, installConfig)
+            templateContent = normalizeLegacyModelReferences(templateContent, installConfig.routing)
             const processedContent = replaceHomePathsInTemplate(templateContent, installDir)
             await fs.writeFile(destFile, processedContent, 'utf-8')
           }
@@ -659,10 +689,10 @@ ${workflow.description}
     }
   }
 
-  // Install prompts (codex, gemini, claude role definitions)
+  // Install prompts (codex, claude role definitions)
   const promptsTemplateDir = join(templateDir, 'prompts')
   if (await fs.pathExists(promptsTemplateDir)) {
-    const modelDirs = ['codex', 'gemini', 'claude']
+    const modelDirs = ['codex', 'claude']
     for (const model of modelDirs) {
       const srcModelDir = join(promptsTemplateDir, model)
       const destModelDir = join(promptsDir, model)

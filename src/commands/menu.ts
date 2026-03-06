@@ -18,7 +18,7 @@ const execAsync = promisify(exec)
 export async function showMainMenu(): Promise<void> {
   while (true) {
     console.log()
-    console.log(ansis.cyan.bold(`  CCG - Claude + Codex + Gemini`))
+    console.log(ansis.cyan.bold(`  CCG - Claude + Codex`))
     console.log(ansis.gray('  Multi-Model Collaboration System'))
     console.log()
 
@@ -147,31 +147,117 @@ async function configApi(): Promise<void> {
   // Show current config
   const currentUrl = settings.env?.ANTHROPIC_BASE_URL
   const currentKey = settings.env?.ANTHROPIC_API_KEY || settings.env?.ANTHROPIC_AUTH_TOKEN
-  if (currentUrl || currentKey) {
+  const hasExistingConfig = Boolean(currentUrl || currentKey)
+
+  if (hasExistingConfig) {
     console.log(ansis.gray('  当前配置:'))
-    if (currentUrl)
-      console.log(ansis.gray(`    URL: ${currentUrl}`))
+    console.log(ansis.gray(`    URL: ${currentUrl || '官方默认'}`))
     if (currentKey)
       console.log(ansis.gray(`    Key: ${currentKey.slice(0, 8)}...${currentKey.slice(-4)}`))
+    else
+      console.log(ansis.gray('    Key: 未配置'))
     console.log()
   }
 
-  const answers = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'url',
-      message: `API URL ${ansis.gray('(留空使用官方)')}`,
-      default: currentUrl || '',
-    },
-    {
-      type: 'password',
-      name: 'key',
-      message: `API Key ${ansis.gray('(留空跳过)')}`,
-      mask: '*',
-    },
-  ])
+  let nextUrl = currentUrl || ''
+  let nextKey = ''
+  let changed = false
+  let shouldUpdateUrl = false
+  let shouldUpdateKey = false
 
-  if (!answers.url && !answers.key) {
+  if (hasExistingConfig) {
+    const { action } = await inquirer.prompt([{
+      type: 'list',
+      name: 'action',
+      message: '选择操作',
+      default: 'keep',
+      choices: [
+        { name: `${ansis.green('✓')} 保持当前配置并返回 ${ansis.gray('(推荐)')}`, value: 'keep' },
+        { name: `${ansis.cyan('➜')} 修改 API URL`, value: 'edit-url' },
+        { name: `${ansis.cyan('➜')} 修改 API Key`, value: 'edit-key' },
+        { name: `${ansis.cyan('➜')} 同时修改 URL 和 Key`, value: 'edit-both' },
+        { name: `${ansis.yellow('◌')} 清除 API URL`, value: 'clear-url' },
+        { name: `${ansis.yellow('◌')} 清除 API Key`, value: 'clear-key' },
+        { name: `${ansis.red('✕')} 清除全部 API 配置`, value: 'clear-all' },
+      ],
+    }])
+
+    if (action === 'keep') {
+      console.log(ansis.gray('未修改配置'))
+      return
+    }
+
+    if (!settings.env)
+      settings.env = {}
+
+    if (action === 'clear-url' || action === 'clear-all') {
+      delete settings.env.ANTHROPIC_BASE_URL
+      nextUrl = ''
+      shouldUpdateUrl = true
+      changed = true
+    }
+
+    if (action === 'clear-key' || action === 'clear-all') {
+      delete settings.env.ANTHROPIC_API_KEY
+      delete settings.env.ANTHROPIC_AUTH_TOKEN
+      nextKey = ''
+      shouldUpdateKey = true
+      changed = true
+    }
+
+    if (action === 'edit-url' || action === 'edit-both') {
+      const { url } = await inquirer.prompt([{
+        type: 'input',
+        name: 'url',
+        message: `API URL ${ansis.gray('(留空保持当前值)')}`,
+        default: currentUrl || '',
+      }])
+      nextUrl = url?.trim() || currentUrl || ''
+      shouldUpdateUrl = true
+      changed = true
+    }
+
+    if (action === 'edit-key' || action === 'edit-both') {
+      const { key } = await inquirer.prompt([{
+        type: 'password',
+        name: 'key',
+        message: `API Key ${ansis.gray('(留空保持当前值)')}`,
+        mask: '*',
+      }])
+      nextKey = key?.trim() || ''
+      shouldUpdateKey = true
+      changed = true
+    }
+  }
+  else {
+    const answers = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'url',
+        message: `API URL ${ansis.gray('(留空使用官方)')}`,
+        default: currentUrl || '',
+      },
+      {
+        type: 'password',
+        name: 'key',
+        message: `API Key ${ansis.gray('(留空跳过)')}`,
+        mask: '*',
+      },
+    ])
+
+    if (!answers.url && !answers.key) {
+      console.log(ansis.gray('未修改配置'))
+      return
+    }
+
+    nextUrl = answers.url?.trim() || ''
+    nextKey = answers.key?.trim() || ''
+    shouldUpdateUrl = true
+    shouldUpdateKey = true
+    changed = true
+  }
+
+  if (!changed) {
     console.log(ansis.gray('未修改配置'))
     return
   }
@@ -180,12 +266,18 @@ async function configApi(): Promise<void> {
   if (!settings.env)
     settings.env = {}
 
-  if (answers.url?.trim()) {
-    settings.env.ANTHROPIC_BASE_URL = answers.url.trim()
+  if (shouldUpdateUrl) {
+    if (nextUrl)
+      settings.env.ANTHROPIC_BASE_URL = nextUrl
+    else
+      delete settings.env.ANTHROPIC_BASE_URL
   }
 
-  if (answers.key?.trim()) {
-    settings.env.ANTHROPIC_API_KEY = answers.key.trim()
+  if (shouldUpdateKey) {
+    if (nextKey)
+      settings.env.ANTHROPIC_API_KEY = nextKey
+    else
+      delete settings.env.ANTHROPIC_API_KEY
     delete settings.env.ANTHROPIC_AUTH_TOKEN
   }
 
@@ -202,7 +294,7 @@ async function configApi(): Promise<void> {
   if (!settings.permissions.allow)
     settings.permissions.allow = []
   const wrapperPerms = [
-    'Bash(~/.claude/bin/codeagent-wrapper --backend gemini*)',
+    'Bash(~/.claude/bin/codeagent-wrapper --backend claude*)',
     'Bash(~/.claude/bin/codeagent-wrapper --backend codex*)',
   ]
   for (const perm of wrapperPerms) {

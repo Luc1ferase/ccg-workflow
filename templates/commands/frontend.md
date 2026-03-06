@@ -1,5 +1,5 @@
----
-description: '前端专项工作流（研究→构思→计划→执行→优化→评审），Gemini 主导'
+﻿---
+description: '前端专项工作流（研究→构思→计划→执行→优化→评审），CLAUDE 主导'
 ---
 
 # Frontend - 前端专项开发
@@ -13,7 +13,7 @@ description: '前端专项工作流（研究→构思→计划→执行→优化
 ## 上下文
 
 - 前端任务：$ARGUMENTS
-- Gemini 主导，Codex 辅助参考
+- CLAUDE 主导，Codex 辅助参考
 - 适用：组件设计、响应式布局、UI 动画、样式优化
 
 ## 你的角色
@@ -21,7 +21,7 @@ description: '前端专项工作流（研究→构思→计划→执行→优化
 你是**前端编排者**，协调多模型完成 UI/UX 任务（研究 → 构思 → 计划 → 执行 → 优化 → 评审），用中文协助用户。
 
 **协作模型**：
-- **Gemini** – 前端 UI/UX（**前端权威，可信赖**）
+- **CLAUDE** – 前端 UI/UX（**前端权威，可信赖**）
 - **Codex** – 后端视角（**前端意见仅供参考**）
 - **Claude (自己)** – 编排、计划、执行、交付
 
@@ -40,7 +40,7 @@ description: '前端专项工作流（研究→构思→计划→执行→优化
 ```
 # 新会话调用
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3.1-pro-preview - \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend CLAUDE - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
@@ -55,7 +55,7 @@ EOF",
 
 # 复用会话调用
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3.1-pro-preview resume <SESSION_ID> - \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend CLAUDE resume <SESSION_ID> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
@@ -71,13 +71,13 @@ EOF",
 
 **角色提示词**：
 
-| 阶段 | Gemini |
+| 阶段 | CLAUDE |
 |------|--------|
-| 分析 | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| 规划 | `~/.claude/.ccg/prompts/gemini/architect.md` |
-| 审查 | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| 分析 | `~/.claude/.ccg/prompts/CLAUDE/analyzer.md` |
+| 规划 | `~/.claude/.ccg/prompts/CLAUDE/architect.md` |
+| 审查 | `~/.claude/.ccg/prompts/CLAUDE/reviewer.md` |
 
-**会话复用**：每次调用返回 `SESSION_ID: xxx`，后续阶段用 `resume xxx` 复用上下文。阶段 2 保存 `GEMINI_SESSION`，阶段 3 和 5 使用 `resume` 复用。
+**会话复用**：每次调用返回 `SESSION_ID: xxx`，后续阶段用 `resume xxx` 复用上下文。阶段 2 保存 `CLAUDE_SESSION`，阶段 3 和 5 使用 `resume` 复用。
 
 ---
 
@@ -93,7 +93,7 @@ EOF",
 
 ### 🔍 阶段 0：Prompt 增强（可选）
 
-`[模式：准备]` - **Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Gemini 时传入增强后的需求**
+`[模式：准备]` - **Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 CLAUDE 时传入增强后的需求**
 
 ### 🔍 阶段 1：研究
 
@@ -104,24 +104,24 @@ EOF",
 
 ### 💡 阶段 2：构思
 
-`[模式：构思]` - Gemini 主导分析
+`[模式：构思]` - CLAUDE 主导分析
 
-**⚠️ 必须调用 Gemini**（参照上方调用规范）：
-- ROLE_FILE: `~/.claude/.ccg/prompts/gemini/analyzer.md`
+**⚠️ 必须调用 CLAUDE**（参照上方调用规范）：
+- ROLE_FILE: `~/.claude/.ccg/prompts/CLAUDE/analyzer.md`
 - 需求：增强后的需求（如未增强则用 $ARGUMENTS）
 - 上下文：阶段 1 收集的项目上下文
 - OUTPUT: UI 可行性分析、推荐方案（至少 2 个）、用户体验评估
 
-**📌 保存 SESSION_ID**（`GEMINI_SESSION`）用于后续阶段复用。
+**📌 保存 SESSION_ID**（`CLAUDE_SESSION`）用于后续阶段复用。
 
 输出方案（至少 2 个），等待用户选择。
 
 ### 📋 阶段 3：计划
 
-`[模式：计划]` - Gemini 主导规划
+`[模式：计划]` - CLAUDE 主导规划
 
-**⚠️ 必须调用 Gemini**（使用 `resume <GEMINI_SESSION>` 复用会话）：
-- ROLE_FILE: `~/.claude/.ccg/prompts/gemini/architect.md`
+**⚠️ 必须调用 CLAUDE**（使用 `resume <CLAUDE_SESSION>` 复用会话）：
+- ROLE_FILE: `~/.claude/.ccg/prompts/CLAUDE/architect.md`
 - 需求：用户选择的方案
 - 上下文：阶段 2 的分析结果
 - OUTPUT: 组件结构、UI 流程、样式方案
@@ -138,10 +138,10 @@ Claude 综合规划，请求用户批准后存入 `.claude/plan/任务名.md`
 
 ### 🚀 阶段 5：优化
 
-`[模式：优化]` - Gemini 主导审查
+`[模式：优化]` - CLAUDE 主导审查
 
-**⚠️ 必须调用 Gemini**（参照上方调用规范）：
-- ROLE_FILE: `~/.claude/.ccg/prompts/gemini/reviewer.md`
+**⚠️ 必须调用 CLAUDE**（参照上方调用规范）：
+- ROLE_FILE: `~/.claude/.ccg/prompts/CLAUDE/reviewer.md`
 - 需求：审查以下前端代码变更
 - 上下文：git diff 或代码内容
 - OUTPUT: 可访问性、响应式、性能、设计一致性问题列表
@@ -160,7 +160,8 @@ Claude 综合规划，请求用户批准后存入 `.claude/plan/任务名.md`
 
 ## 关键规则
 
-1. **Gemini 前端意见可信赖**
+1. **CLAUDE 前端意见可信赖**
 2. **Codex 前端意见仅供参考**
 3. 外部模型对文件系统**零写入权限**
 4. Claude 负责所有代码写入和文件操作
+

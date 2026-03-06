@@ -12,7 +12,7 @@ import { readCcgConfig } from './utils/config'
 function customizeHelp(sections: any[]): any[] {
   sections.unshift({
     title: '',
-    body: ansis.cyan.bold(`CCG - Claude + Codex + Gemini v${version}`),
+    body: ansis.cyan.bold(`CCG - Claude + Codex v${version}`),
   })
 
   sections.push({
@@ -58,7 +58,7 @@ function customizeHelp(sections: any[]): any[] {
       `  ${ansis.cyan('npx ccg i')}`,
       '',
       ansis.gray(`  # ${i18n.t('cli:help.exampleDescriptions.customModels')}`),
-      `  ${ansis.cyan('npx ccg i --frontend gemini,codex --backend codex,gemini')}`,
+      `  ${ansis.cyan('npx ccg i --frontend claude,codex --backend codex,claude')}`,
       '',
       ansis.gray(`  # ${i18n.t('cli:help.exampleDescriptions.parallelMode')}`),
       `  ${ansis.cyan('npx ccg i --mode parallel')}`,
@@ -98,8 +98,8 @@ export async function setupCommands(cli: CAC): Promise<void> {
     .option('--force, -f', '强制覆盖现有配置')
     .option('--skip-prompt, -s', '跳过所有交互式提示（非交互模式）')
     .option('--skip-mcp', '跳过 MCP 配置（更新时使用）')
-    .option('--frontend, -F <models>', '前端模型（逗号分隔: gemini,codex,claude）')
-    .option('--backend, -B <models>', '后端模型（逗号分隔: codex,gemini,claude）')
+    .option('--frontend, -F <models>', '前端模型（逗号分隔: claude,codex）')
+    .option('--backend, -B <models>', '后端模型（逗号分隔: codex,claude）')
     .option('--mode, -m <mode>', '协作模式 (parallel, smart, sequential)')
     .option('--workflows, -w <workflows>', '要安装的工作流（逗号分隔或 "all"）')
     .option('--install-dir, -d <path>', '安装目录（默认: ~/.claude）')

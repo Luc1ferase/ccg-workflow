@@ -1098,9 +1098,9 @@ func TestBackendParseArgs_BackendFlag(t *testing.T) {
 			want: "claude",
 		},
 		{
-			name: "gemini resume",
-			args: []string{"codeagent-wrapper", "--backend", "gemini", "resume", "sid", "task"},
-			want: "gemini",
+			name: "claude resume",
+			args: []string{"codeagent-wrapper", "--backend", "claude", "resume", "sid", "task"},
+			want: "claude",
 		},
 		{
 			name: "backend equals syntax",
@@ -1255,7 +1255,7 @@ do something`
 func TestParallelParseConfig_Backend(t *testing.T) {
 	input := `---TASK---
 id: task-1
-backend: gemini
+backend: claude
 session_id: sess-123
 ---CONTENT---
 do something`
@@ -1268,8 +1268,8 @@ do something`
 		t.Fatalf("expected 1 task, got %d", len(cfg.Tasks))
 	}
 	task := cfg.Tasks[0]
-	if task.Backend != "gemini" {
-		t.Fatalf("backend = %q, want gemini", task.Backend)
+	if task.Backend != "claude" {
+		t.Fatalf("backend = %q, want claude", task.Backend)
 	}
 	if task.Mode != "resume" || task.SessionID != "sess-123" {
 		t.Fatalf("expected resume mode with session, got mode=%q session=%q", task.Mode, task.SessionID)
@@ -1499,7 +1499,6 @@ func TestBackendSelectBackend(t *testing.T) {
 	}{
 		{"codex", "codex", CodexBackend{}},
 		{"claude mixed case", "ClAuDe", ClaudeBackend{}},
-		{"gemini", "gemini", GeminiBackend{}},
 	}
 
 	for _, tt := range tests {
@@ -1516,10 +1515,6 @@ func TestBackendSelectBackend(t *testing.T) {
 			case ClaudeBackend:
 				if _, ok := got.(ClaudeBackend); !ok {
 					t.Fatalf("expected ClaudeBackend, got %T", got)
-				}
-			case GeminiBackend:
-				if _, ok := got.(GeminiBackend); !ok {
-					t.Fatalf("expected GeminiBackend, got %T", got)
 				}
 			}
 		})
@@ -2925,7 +2920,7 @@ do one
 
 ---TASK---
 id: second
-backend: gemini
+backend: claude
 ---CONTENT---
 do two`)
 	os.Args = []string{"codeagent-wrapper", "--backend", "claude", "--parallel"}
@@ -2942,8 +2937,8 @@ do two`)
 	if !firstOK || firstBackend != "claude" {
 		t.Fatalf("first backend = %q (present=%v), want claude", firstBackend, firstOK)
 	}
-	if !secondOK || secondBackend != "gemini" {
-		t.Fatalf("second backend = %q (present=%v), want gemini", secondBackend, secondOK)
+	if !secondOK || secondBackend != "claude" {
+		t.Fatalf("second backend = %q (present=%v), want claude", secondBackend, secondOK)
 	}
 }
 

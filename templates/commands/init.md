@@ -1,4 +1,4 @@
----
+﻿---
 description: '初始化项目 AI 上下文：生成根级与模块级 CLAUDE.md 索引'
 ---
 
@@ -98,3 +98,4 @@ Task({
 2. 先调用 `get-current-datetime` 获取时间戳
 3. 再调用 `init-architect` 执行完整扫描
 4. 结果在主对话打印摘要，全文由子智能体写入仓库
+

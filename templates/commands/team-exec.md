@@ -1,4 +1,4 @@
----
+﻿---
 description: 'Agent Teams 并行实施 - 读取计划文件，spawn Builder teammates 并行写代码'
 ---
 <!-- CCG:TEAM:EXEC:START -->
@@ -105,3 +105,4 @@ description: 'Agent Teams 并行实施 - 读取计划文件，spawn Builder team
 - [ ] 变更摘要已输出
 - [ ] Team 已清理
 <!-- CCG:TEAM:EXEC:END -->
+

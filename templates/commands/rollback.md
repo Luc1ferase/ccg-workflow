@@ -1,4 +1,4 @@
----
+﻿---
 description: '交互式 Git 回滚：安全回滚分支到历史版本，支持 reset/revert 模式'
 ---
 
@@ -114,3 +114,4 @@ git revert --no-edit <target>..HEAD
 - **reset vs revert**：reset 改变历史，需强推；revert 更安全
 - **LFS/子模块**：回滚前确保状态一致
 - **CI 触发**：回滚后可能自动触发流水线
+

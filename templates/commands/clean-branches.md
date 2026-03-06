@@ -1,4 +1,4 @@
----
+﻿---
 description: '清理 Git 分支：安全清理已合并或过期分支，默认 dry-run 模式'
 ---
 
@@ -115,3 +115,4 @@ git config --get-all branch.cleanup.protected
 3. **谨慎 --force** – 除非确定无用
 4. **团队协作** – 清理远程分支前先通知
 5. **定期运行** – 每月/季度一次保持清爽
+

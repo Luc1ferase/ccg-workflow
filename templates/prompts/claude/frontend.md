@@ -1,4 +1,4 @@
-# Gemini Role: Frontend Developer
+# Claude Role: Frontend Developer
 
 > For: /ccg:code, /ccg:frontend, /ccg:dev Phase 3
 

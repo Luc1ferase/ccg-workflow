@@ -122,8 +122,7 @@ async function askReconfigureRouting(currentRouting?: ModelRouting): Promise<Mod
     name: 'selectedFrontend',
     message: i18n.t('init:selectFrontendModels'),
     choices: [
-      { name: 'Gemini', value: 'gemini' as ModelType, checked: currentRouting?.frontend.models.includes('gemini') ?? true },
-      { name: 'Claude', value: 'claude' as ModelType, checked: currentRouting?.frontend.models.includes('claude') ?? false },
+      { name: 'Claude', value: 'claude' as ModelType, checked: currentRouting?.frontend.models.includes('claude') ?? true },
       { name: 'Codex', value: 'codex' as ModelType, checked: currentRouting?.frontend.models.includes('codex') ?? false },
     ],
     validate: (answer: string[]) => answer.length > 0 || i18n.t('init:validation.selectAtLeastOne'),
@@ -136,7 +135,6 @@ async function askReconfigureRouting(currentRouting?: ModelRouting): Promise<Mod
     message: i18n.t('init:selectBackendModels'),
     choices: [
       { name: 'Codex', value: 'codex' as ModelType, checked: currentRouting?.backend.models.includes('codex') ?? true },
-      { name: 'Gemini', value: 'gemini' as ModelType, checked: currentRouting?.backend.models.includes('gemini') ?? false },
       { name: 'Claude', value: 'claude' as ModelType, checked: currentRouting?.backend.models.includes('claude') ?? false },
     ],
     validate: (answer: string[]) => answer.length > 0 || i18n.t('init:validation.selectAtLeastOne'),

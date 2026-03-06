@@ -1,4 +1,4 @@
----
+﻿---
 description: '智能 Git 提交：分析改动生成 Conventional Commit 信息，支持拆分建议'
 ---
 
@@ -120,3 +120,4 @@ git commit [-S] [--no-verify] [-s] -F .git/COMMIT_EDITMSG
 2. **尊重钩子** – 默认执行，`--no-verify` 可跳过
 3. **不改源码** – 只读写 `.git/COMMIT_EDITMSG`
 4. **原子提交** – 一次提交只做一件事
+

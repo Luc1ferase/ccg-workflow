@@ -1,4 +1,4 @@
----
+﻿---
 description: '管理 Git Worktree：在 ../.ccg/项目名/ 目录创建，支持 IDE 集成和内容迁移'
 ---
 
@@ -126,3 +126,4 @@ parent-directory/
 - Worktree 共享 `.git` 目录，节省磁盘空间
 - 迁移仅限未提交改动，已提交内容用 `git cherry-pick`
 - 支持 Windows、macOS、Linux
+

@@ -1,4 +1,4 @@
----
+﻿---
 description: '初始化 OpenSpec (OPSX) 环境 + 验证多模型 MCP 工具'
 ---
 <!-- CCG:SPEC:INIT:START -->
@@ -64,9 +64,9 @@ description: '初始化 OpenSpec (OPSX) 环境 + 验证多模型 MCP 工具'
      ```bash
      ~/.claude/bin/codeagent-wrapper --backend codex - "{{WORKDIR}}" <<< "echo test"
      ```
-   - Test Gemini backend:
+   - Test CLAUDE backend:
      ```bash
-     ~/.claude/bin/codeagent-wrapper --backend gemini --gemini-model gemini-3.1-pro-preview - "{{WORKDIR}}" <<< "echo test"
+     ~/.claude/bin/codeagent-wrapper --backend CLAUDE - "{{WORKDIR}}" <<< "echo test"
      ```
    - For each unavailable tool, display warning with installation instructions.
 
@@ -89,7 +89,7 @@ description: '初始化 OpenSpec (OPSX) 环境 + 验证多模型 MCP 工具'
    OPSX Skills               ✓/✗
    codeagent-wrapper         ✓/✗
    Codex backend             ✓/✗
-   Gemini backend            ✓/✗
+   CLAUDE backend            ✓/✗
    ace-tool MCP              ✓/✗ (optional)
    ```
 
@@ -105,6 +105,7 @@ description: '初始化 OpenSpec (OPSX) 环境 + 验证多模型 MCP 工具'
 - OpenSpec (OPSX) CLI: `npx @fission-ai/openspec --help`
 - Profile Management: `openspec config profile`
 - CCG Workflow: `npx ccg-workflow`
-- Codex/Gemini MCP: Bundled with codeagent-wrapper
+- Codex/CLAUDE MCP: Bundled with codeagent-wrapper
 - Node.js >= 18.x required for OpenSpec
 <!-- CCG:SPEC:INIT:END -->
+

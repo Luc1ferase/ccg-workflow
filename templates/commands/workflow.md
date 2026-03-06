@@ -1,5 +1,5 @@
----
-description: '多模型协作开发工作流（研究→构思→计划→执行→优化→评审），智能路由前端→Gemini、后端→Codex'
+﻿---
+description: '多模型协作开发工作流（研究→构思→计划→执行→优化→评审），智能路由前端→CLAUDE、后端→Codex'
 ---
 
 # Workflow - 多模型协作开发
@@ -16,7 +16,7 @@ description: '多模型协作开发工作流（研究→构思→计划→执行
 
 - 要开发的任务：$ARGUMENTS
 - 带质量把关的结构化 6 阶段工作流
-- 多模型协作：Codex（后端）+ Gemini（前端）+ Claude（编排）
+- 多模型协作：Codex（后端）+ CLAUDE（前端）+ Claude（编排）
 - MCP 服务集成（ace-tool）以增强功能
 
 ## 你的角色
@@ -25,7 +25,7 @@ description: '多模型协作开发工作流（研究→构思→计划→执行
 
 **协作模型**：
 - **Codex** – 后端逻辑、算法、调试（**后端权威，可信赖**）
-- **Gemini** – 前端 UI/UX、视觉设计（**前端高手，后端意见仅供参考**）
+- **CLAUDE** – 前端 UI/UX、视觉设计（**前端高手，后端意见仅供参考**）
 - **Claude (自己)** – 编排、计划、执行、交付
 
 ---
@@ -43,7 +43,7 @@ description: '多模型协作开发工作流（研究→构思→计划→执行
 ```
 # 新会话调用
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|CLAUDE> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
@@ -58,7 +58,7 @@ EOF",
 
 # 复用会话调用
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|CLAUDE> resume <SESSION_ID> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
@@ -73,15 +73,15 @@ EOF",
 ```
 
 **模型参数说明**：
-- `{{GEMINI_MODEL_FLAG}}`：当使用 `--backend gemini` 时，替换为 `--gemini-model gemini-3.1-pro-preview `（注意末尾空格）；使用 codex 时替换为空字符串
+- ``：当使用 `--backend CLAUDE` 时，替换为 ``（注意末尾空格）；使用 codex 时替换为空字符串
 
 **角色提示词**：
 
-| 阶段 | Codex | Gemini |
+| 阶段 | Codex | CLAUDE |
 |------|-------|--------|
-| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| 规划 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
-| 审查 | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/CLAUDE/analyzer.md` |
+| 规划 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/CLAUDE/architect.md` |
+| 审查 | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/CLAUDE/reviewer.md` |
 
 **会话复用**：每次调用返回 `SESSION_ID: xxx`，后续阶段用 `resume xxx` 子命令复用上下文（注意：是 `resume`，不是 `--resume`）。
 
@@ -118,7 +118,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 `[模式：研究]` - 理解需求并收集上下文：
 
-1. **Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex/Gemini 时传入增强后的需求**
+1. **Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex/CLAUDE 时传入增强后的需求**
 2. **上下文检索**：调用 `{{MCP_SEARCH_TOOL}}`
 3. **需求完整性评分**（0-10 分）：
    - 目标明确性（0-3）、预期结果（0-3）、边界范围（0-2）、约束条件（0-2）
@@ -130,9 +130,9 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 **并行调用**（`run_in_background: true`）：
 - Codex：使用分析提示词，输出技术可行性、方案、风险
-- Gemini：使用分析提示词，输出 UI 可行性、方案、体验
+- CLAUDE：使用分析提示词，输出 UI 可行性、方案、体验
 
-用 `TaskOutput` 等待结果。**📌 保存 SESSION_ID**（`CODEX_SESSION` 和 `GEMINI_SESSION`）。
+用 `TaskOutput` 等待结果。**📌 保存 SESSION_ID**（`CODEX_SESSION` 和 `CLAUDE_SESSION`）。
 
 **务必遵循上方 `多模型调用规范` 的 `重要` 指示**
 
@@ -144,13 +144,13 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 **并行调用**（复用会话 `resume <SESSION_ID>`）：
 - Codex：使用规划提示词 + `resume $CODEX_SESSION`，输出后端架构
-- Gemini：使用规划提示词 + `resume $GEMINI_SESSION`，输出前端架构
+- CLAUDE：使用规划提示词 + `resume $CLAUDE_SESSION`，输出前端架构
 
 用 `TaskOutput` 等待结果。
 
 **务必遵循上方 `多模型调用规范` 的 `重要` 指示**
 
-**Claude 综合规划**：采纳 Codex 后端规划 + Gemini 前端规划，用户批准后存入 `.claude/plan/任务名.md`
+**Claude 综合规划**：采纳 Codex 后端规划 + CLAUDE 前端规划，用户批准后存入 `.claude/plan/任务名.md`
 
 ### ⚡ 阶段 4：实施
 
@@ -166,7 +166,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 **并行调用**：
 - Codex：使用审查提示词，关注安全、性能、错误处理
-- Gemini：使用审查提示词，关注可访问性、设计一致性
+- CLAUDE：使用审查提示词，关注可访问性、设计一致性
 
 用 `TaskOutput` 等待结果。整合审查意见，用户确认后执行优化。
 
@@ -188,3 +188,4 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 1. 阶段顺序不可跳过（除非用户明确指令）
 2. 外部模型对文件系统**零写入权限**，所有修改由 Claude 执行
 3. 评分 <7 或用户未批准时**强制停止**
+

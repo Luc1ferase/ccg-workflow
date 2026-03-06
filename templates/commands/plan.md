@@ -1,4 +1,4 @@
----
+﻿---
 description: '多模型协作规划 - 上下文检索 + 双模型分析 → 生成 Step-by-step 实施计划'
 ---
 
@@ -11,7 +11,7 @@ $ARGUMENTS
 ## 核心协议
 
 - **语言协议**：与工具/模型交互用**英语**，与用户交互用**中文**
-- **强制并行**：Codex/Gemini 调用必须使用 `run_in_background: true`（包含单模型调用，避免阻塞主线程）
+- **强制并行**：Codex/CLAUDE 调用必须使用 `run_in_background: true`（包含单模型调用，避免阻塞主线程）
 - **代码主权**：外部模型对文件系统**零写入权限**，所有修改由 Claude 执行
 - **止损机制**：当前阶段输出通过验证前，不进入下一阶段
 - **仅规划**：本命令允许读取上下文与写入 `.claude/plan/*` 计划文件，但**禁止修改产品代码**
@@ -30,7 +30,7 @@ $ARGUMENTS
 
 ```
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|CLAUDE> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求>
@@ -45,14 +45,14 @@ EOF",
 ```
 
 **模型参数说明**：
-- `{{GEMINI_MODEL_FLAG}}`：当使用 `--backend gemini` 时，替换为 `--gemini-model gemini-3.1-pro-preview `（注意末尾空格）；使用 codex 时替换为空字符串
+- ``：当使用 `--backend CLAUDE` 时，替换为 ``（注意末尾空格）；使用 codex 时替换为空字符串
 
 **角色提示词**：
 
-| 阶段 | Codex | Gemini |
+| 阶段 | Codex | CLAUDE |
 |------|-------|--------|
-| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| 规划 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
+| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/CLAUDE/analyzer.md` |
+| 规划 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/CLAUDE/architect.md` |
 
 **会话复用**：每次调用返回 `SESSION_ID: xxx`（通常由 wrapper 输出），**必须保存**以供后续 `/ccg:execute` 使用。
 
@@ -113,7 +113,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 #### 2.1 分发输入
 
-**并行调用** Codex 和 Gemini（`run_in_background: true`）：
+**并行调用** Codex 和 CLAUDE（`run_in_background: true`）：
 
 将**原始需求**（不带预设观点）分发给两个模型：
 
@@ -122,12 +122,12 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    - 关注：技术可行性、架构影响、性能考量、潜在风险
    - OUTPUT: 多角度解决方案 + 优劣势分析
 
-2. **Gemini 前端分析**：
-   - ROLE_FILE: `~/.claude/.ccg/prompts/gemini/analyzer.md`
+2. **CLAUDE 前端分析**：
+   - ROLE_FILE: `~/.claude/.ccg/prompts/CLAUDE/analyzer.md`
    - 关注：UI/UX 影响、用户体验、视觉设计
    - OUTPUT: 多角度解决方案 + 优劣势分析
 
-用 `TaskOutput` 等待两个模型的完整结果。**📌 保存 SESSION_ID**（`CODEX_SESSION` 和 `GEMINI_SESSION`）。
+用 `TaskOutput` 等待两个模型的完整结果。**📌 保存 SESSION_ID**（`CODEX_SESSION` 和 `CLAUDE_SESSION`）。
 
 #### 2.2 交叉验证
 
@@ -135,7 +135,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 1. **识别一致观点**（强信号）
 2. **识别分歧点**（需权衡）
-3. **互补优势**：后端逻辑以 Codex 为准，前端设计以 Gemini 为准
+3. **互补优势**：后端逻辑以 Codex 为准，前端设计以 CLAUDE 为准
 4. **逻辑推演**：消除方案中的逻辑漏洞
 
 #### 2.3（可选但推荐）双模型产出“计划草案”
@@ -146,8 +146,8 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    - ROLE_FILE: `~/.claude/.ccg/prompts/codex/architect.md`
    - OUTPUT: Step-by-step plan + pseudo-code（重点：数据流/边界条件/错误处理/测试策略）
 
-2. **Gemini 计划草案**（前端权威）：
-   - ROLE_FILE: `~/.claude/.ccg/prompts/gemini/architect.md`
+2. **CLAUDE 计划草案**（前端权威）：
+   - ROLE_FILE: `~/.claude/.ccg/prompts/CLAUDE/architect.md`
    - OUTPUT: Step-by-step plan + pseudo-code（重点：信息架构/交互/可访问性/视觉一致性）
 
 用 `TaskOutput` 等待两个模型的完整结果，并记录其建议的关键差异点。
@@ -160,12 +160,12 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 ## 📋 实施计划：<任务名称>
 
 ### 任务类型
-- [ ] 前端 (→ Gemini)
+- [ ] 前端 (→ CLAUDE)
 - [ ] 后端 (→ Codex)
 - [ ] 全栈 (→ 并行)
 
 ### 技术方案
-<综合 Codex + Gemini 分析的最优方案>
+<综合 Codex + CLAUDE 分析的最优方案>
 
 ### 实施步骤
 1. <步骤 1> - 预期产物
@@ -183,7 +183,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 ### SESSION_ID（供 /ccg:execute 使用）
 - CODEX_SESSION: <session_id>
-- GEMINI_SESSION: <session_id>
+- CLAUDE_SESSION: <session_id>
 ```
 
 ### ⛔ Phase 2 结束：计划交付（非执行）
@@ -254,6 +254,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 1. **仅规划不实施** – 本命令不执行任何代码变更
 2. **不问 Y/N** – 只展示计划，让用户决定下一步
-3. **信任规则** – 后端以 Codex 为准，前端以 Gemini 为准
+3. **信任规则** – 后端以 Codex 为准，前端以 CLAUDE 为准
 4. 外部模型对文件系统**零写入权限**
-5. **SESSION_ID 交接** – 计划末尾必须包含 `CODEX_SESSION` / `GEMINI_SESSION`（供 `/ccg:execute resume <SESSION_ID>` 使用）
+5. **SESSION_ID 交接** – 计划末尾必须包含 `CODEX_SESSION` / `CLAUDE_SESSION`（供 `/ccg:execute resume <SESSION_ID>` 使用）
+

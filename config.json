@@ -1,13 +1,13 @@
 {
   "version": "1.0",
   "name": "ccg",
-  "description": "CCG: Claude Code + Codex + Gemini 多模型协作系统",
+  "description": "CCG: Claude Code + Codex 双模型协作系统",
   "install_dir": "~/.claude",
   "log_file": "install.log",
   "modules": {
     "core": {
       "enabled": true,
-      "description": "核心工作流 - 多模型协作 (Codex + Gemini)",
+      "description": "核心工作流 - 双模型协作 (Codex + Claude)",
       "operations": [
         {
           "type": "merge_dir",
@@ -35,7 +35,7 @@
     },
     "codex-only": {
       "enabled": false,
-      "description": "仅 Codex 后端（无 Gemini）",
+      "description": "仅 Codex 后端（无 Claude）",
       "operations": [
         {
           "type": "build_go",
@@ -45,9 +45,9 @@
         }
       ]
     },
-    "gemini-only": {
+    "claude-only": {
       "enabled": false,
-      "description": "仅 Gemini 后端（无 Codex）",
+      "description": "仅 Claude 后端（无 Codex）",
       "operations": [
         {
           "type": "build_go",

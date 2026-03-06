@@ -1,4 +1,4 @@
----
+﻿---
 description: '智能功能开发 - 自动识别输入类型，规划/讨论/实施全流程'
 ---
 
@@ -21,7 +21,7 @@ $ARGUMENTS
 ```
 # 新会话调用
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|CLAUDE> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
@@ -36,7 +36,7 @@ EOF",
 
 # 复用会话调用
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|CLAUDE> resume <SESSION_ID> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
@@ -51,16 +51,16 @@ EOF",
 ```
 
 **模型参数说明**：
-- `{{GEMINI_MODEL_FLAG}}`：当使用 `--backend gemini` 时，替换为 `--gemini-model gemini-3.1-pro-preview `（注意末尾空格）；使用 codex 时替换为空字符串
+- ``：当使用 `--backend CLAUDE` 时，替换为 ``（注意末尾空格）；使用 codex 时替换为空字符串
 
 **角色提示词**：
 
-| 阶段 | Codex | Gemini |
+| 阶段 | Codex | CLAUDE |
 |------|-------|--------|
-| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| 规划 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
-| 实施 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/frontend.md` |
-| 审查 | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/CLAUDE/analyzer.md` |
+| 规划 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/CLAUDE/architect.md` |
+| 实施 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/CLAUDE/frontend.md` |
+| 审查 | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/CLAUDE/reviewer.md` |
 
 **会话复用**：每次调用返回 `SESSION_ID: xxx`，后续阶段用 `resume xxx` 复用上下文。
 
@@ -103,7 +103,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 #### 2.0 Prompt 增强
 
-**Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex/Gemini 时传入增强后的需求**
+**Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex/CLAUDE 时传入增强后的需求**
 
 #### 2.1 上下文检索
 
@@ -163,9 +163,9 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 按上方调用规范调用外部模型：
 
-- **前端任务**：调用 Gemini，使用实施提示词
+- **前端任务**：调用 CLAUDE，使用实施提示词
 - **后端任务**：调用 Codex，使用实施提示词
-- **全栈任务**：并行调用 Codex + Gemini（`run_in_background: true`），用 `TaskOutput` 等待结果
+- **全栈任务**：并行调用 Codex + CLAUDE（`run_in_background: true`），用 `TaskOutput` 等待结果
 
 **⚠️ 强制规则：必须等待 TaskOutput 返回所有模型的完整结果后才能进入下一阶段**
 
@@ -188,7 +188,7 @@ git diff --name-status
 2. **文档一致性**：规划文档与实际执行保持同步
 3. **依赖关系管理**：前端任务必须确保 UI 设计完整性
 4. **多模型信任规则**：
-   - 前端以 Gemini 为准
+   - 前端以 CLAUDE 为准
    - 后端以 Codex 为准
 5. **用户沟通透明**：所有判断和动作都要明确告知用户
 
@@ -199,3 +199,4 @@ git diff --name-status
 ```bash
 /feat <功能描述>
 ```
+

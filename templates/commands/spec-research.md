@@ -1,4 +1,4 @@
----
+﻿---
 description: '需求 → 约束集（并行探索 + OPSX 提案）'
 ---
 <!-- CCG:SPEC:RESEARCH:START -->
@@ -60,7 +60,7 @@ description: '需求 → 约束集（并行探索 + OPSX 提案）'
      "success_criteria_hints": ["observable success behaviors"]
    }
    ```
-   - Run Codex for backend boundaries, Gemini for frontend boundaries.
+   - Run Codex for backend boundaries, CLAUDE for frontend boundaries.
 
 5. **Aggregate and Synthesize**
    - Collect all subagent outputs.
@@ -98,3 +98,4 @@ description: '需求 → 约束集（并行探索 + OPSX 提案）'
 - Check prior research: `ls openspec/changes/*/`
 - Use `AskUserQuestion` for ANY ambiguity—never assume or guess
 <!-- CCG:SPEC:RESEARCH:END -->
+

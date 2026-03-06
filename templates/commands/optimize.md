@@ -1,5 +1,5 @@
----
-description: '多模型性能优化：Codex 后端优化 + Gemini 前端优化'
+﻿---
+description: '多模型性能优化：Codex 后端优化 + CLAUDE 前端优化'
 ---
 
 # Optimize - 多模型性能优化
@@ -16,13 +16,13 @@ description: '多模型性能优化：Codex 后端优化 + Gemini 前端优化'
 
 - 优化目标：$ARGUMENTS
 - Codex 专注后端性能（数据库、算法、缓存）
-- Gemini 专注前端性能（渲染、加载、交互）
+- CLAUDE 专注前端性能（渲染、加载、交互）
 
 ## 你的角色
 
 你是**性能工程师**，编排多模型优化流程：
 - **Codex** – 后端性能优化（**后端权威**）
-- **Gemini** – 前端性能优化（**前端权威**）
+- **CLAUDE** – 前端性能优化（**前端权威**）
 - **Claude (自己)** – 综合优化、实施变更
 
 ---
@@ -39,7 +39,7 @@ description: '多模型性能优化：Codex 后端优化 + Gemini 前端优化'
 
 ```
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|CLAUDE> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
@@ -54,14 +54,14 @@ EOF",
 ```
 
 **模型参数说明**：
-- `{{GEMINI_MODEL_FLAG}}`：当使用 `--backend gemini` 时，替换为 `--gemini-model gemini-3.1-pro-preview `（注意末尾空格）；使用 codex 时替换为空字符串
+- ``：当使用 `--backend CLAUDE` 时，替换为 ``（注意末尾空格）；使用 codex 时替换为空字符串
 
 **角色提示词**：
 
 | 模型 | 提示词 |
 |------|--------|
 | Codex | `~/.claude/.ccg/prompts/codex/optimizer.md` |
-| Gemini | `~/.claude/.ccg/prompts/gemini/optimizer.md` |
+| CLAUDE | `~/.claude/.ccg/prompts/CLAUDE/optimizer.md` |
 
 **并行调用**：使用 `run_in_background: true` 启动，用 `TaskOutput` 等待结果。**必须等所有模型返回后才能进入下一阶段**。
 
@@ -90,7 +90,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 ### 🔍 阶段 0：Prompt 增强（可选）
 
-`[模式：准备]` - **Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex/Gemini 时传入增强后的需求**
+`[模式：准备]` - **Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex/CLAUDE 时传入增强后的需求**
 
 ### 🔍 阶段 1：性能基线
 
@@ -111,8 +111,8 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    - 需求：分析后端性能问题（$ARGUMENTS）
    - OUTPUT：性能瓶颈列表、优化方案、预期收益
 
-2. **Gemini 前端分析**：`Bash({ command: "...--backend gemini...", run_in_background: true })`
-   - ROLE_FILE: `~/.claude/.ccg/prompts/gemini/optimizer.md`
+2. **CLAUDE 前端分析**：`Bash({ command: "...--backend CLAUDE...", run_in_background: true })`
+   - ROLE_FILE: `~/.claude/.ccg/prompts/CLAUDE/optimizer.md`
    - 需求：分析前端性能问题（Core Web Vitals）
    - OUTPUT：性能瓶颈列表、优化方案、预期收益
 
@@ -165,4 +165,5 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 1. **先测量后优化** – 没有数据不盲目优化
 2. **性价比优先** – 高影响 + 低难度优先
 3. **不破坏功能** – 优化不能引入 bug
-4. **信任规则** – 后端以 Codex 为准，前端以 Gemini 为准
+4. **信任规则** – 后端以 Codex 为准，前端以 CLAUDE 为准
+

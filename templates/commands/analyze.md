@@ -1,5 +1,5 @@
----
-description: '多模型技术分析（并行执行）：Codex 后端视角 + Gemini 前端视角，交叉验证后综合见解'
+﻿---
+description: '多模型技术分析（并行执行）：Codex 后端视角 + CLAUDE 前端视角，交叉验证后综合见解'
 ---
 
 # Analyze - 多模型技术分析
@@ -17,7 +17,7 @@ description: '多模型技术分析（并行执行）：Codex 后端视角 + Gem
 你是**分析协调者**，编排多模型分析流程：
 - **ace-tool** – 代码上下文检索
 - **Codex** – 后端/系统视角（**后端权威**）
-- **Gemini** – 前端/用户视角（**前端权威**）
+- **CLAUDE** – 前端/用户视角（**前端权威**）
 - **Claude (自己)** – 综合见解
 
 ---
@@ -34,7 +34,7 @@ description: '多模型技术分析（并行执行）：Codex 后端视角 + Gem
 
 ```
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|CLAUDE> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
@@ -49,14 +49,14 @@ EOF",
 ```
 
 **模型参数说明**：
-- `{{GEMINI_MODEL_FLAG}}`：当使用 `--backend gemini` 时，替换为 `--gemini-model gemini-3.1-pro-preview `（注意末尾空格）；使用 codex 时替换为空字符串
+- ``：当使用 `--backend CLAUDE` 时，替换为 ``（注意末尾空格）；使用 codex 时替换为空字符串
 
 **角色提示词**：
 
 | 模型 | 提示词 |
 |------|--------|
 | Codex | `~/.claude/.ccg/prompts/codex/analyzer.md` |
-| Gemini | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
+| CLAUDE | `~/.claude/.ccg/prompts/CLAUDE/analyzer.md` |
 
 **并行调用**：使用 `run_in_background: true` 启动，用 `TaskOutput` 等待结果。**必须等所有模型返回后才能进入下一阶段**。
 
@@ -79,7 +79,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 ### 🔍 阶段 0：Prompt 增强（可选）
 
-`[模式：准备]` - **Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex/Gemini 时传入增强后的需求**
+`[模式：准备]` - **Prompt 增强**（按 `/ccg:enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex/CLAUDE 时传入增强后的需求**
 
 ### 🔍 阶段 1：上下文检索
 
@@ -99,8 +99,8 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    - ROLE_FILE: `~/.claude/.ccg/prompts/codex/analyzer.md`
    - OUTPUT：技术可行性、架构影响、性能考量
 
-2. **Gemini 前端分析**：`Bash({ command: "...--backend gemini...", run_in_background: true })`
-   - ROLE_FILE: `~/.claude/.ccg/prompts/gemini/analyzer.md`
+2. **CLAUDE 前端分析**：`Bash({ command: "...--backend CLAUDE...", run_in_background: true })`
+   - ROLE_FILE: `~/.claude/.ccg/prompts/CLAUDE/analyzer.md`
    - OUTPUT：UI/UX 影响、用户体验、视觉设计考量
 
 用 `TaskOutput` 等待两个模型的完整结果。**必须等所有模型返回后才能进入下一阶段**。
@@ -116,7 +116,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    - **一致观点**（强信号）
    - **分歧点**（需权衡）
    - **互补见解**（各自领域洞察）
-3. 按信任规则权衡：后端以 Codex 为准，前端以 Gemini 为准
+3. 按信任规则权衡：后端以 Codex 为准，前端以 CLAUDE 为准
 
 ### 📊 阶段 4：综合输出
 
@@ -129,7 +129,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 1. <双方都认同的点>
 
 ### 分歧点（需权衡）
-| 议题 | Codex 观点 | Gemini 观点 | 建议 |
+| 议题 | Codex 观点 | CLAUDE 观点 | 建议 |
 |------|------------|-------------|------|
 
 ### 核心结论
@@ -157,5 +157,6 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 ## 关键规则
 
 1. **仅分析不修改** – 本命令不执行任何代码变更
-2. **信任规则** – 后端以 Codex 为准，前端以 Gemini 为准
+2. **信任规则** – 后端以 Codex 为准，前端以 CLAUDE 为准
 3. 外部模型对文件系统**零写入权限**
+

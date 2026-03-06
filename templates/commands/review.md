@@ -1,4 +1,4 @@
----
+﻿---
 description: '多模型代码审查：无参数时自动审查 git diff，双模型交叉验证'
 ---
 
@@ -29,7 +29,7 @@ description: '多模型代码审查：无参数时自动审查 git diff，双模
 
 ```
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"{{WORKDIR}}\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|CLAUDE> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
 审查以下代码变更：
@@ -44,14 +44,14 @@ EOF",
 ```
 
 **模型参数说明**：
-- `{{GEMINI_MODEL_FLAG}}`：当使用 `--backend gemini` 时，替换为 `--gemini-model gemini-3.1-pro-preview `（注意末尾空格）；使用 codex 时替换为空字符串
+- ``：当使用 `--backend CLAUDE` 时，替换为 ``（注意末尾空格）；使用 codex 时替换为空字符串
 
 **角色提示词**：
 
 | 模型 | 提示词 |
 |------|--------|
 | Codex | `~/.claude/.ccg/prompts/codex/reviewer.md` |
-| Gemini | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| CLAUDE | `~/.claude/.ccg/prompts/CLAUDE/reviewer.md` |
 
 **并行调用**：使用 `run_in_background: true` 启动，用 `TaskOutput` 等待结果。**必须等所有模型返回后才能进入下一阶段**。
 
@@ -91,8 +91,8 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    - 需求：审查代码变更（git diff 内容）
    - OUTPUT：按 Critical/Major/Minor/Suggestion 分类列出安全性、性能、错误处理问题
 
-2. **Gemini 前端审查**：`Bash({ command: "...--backend gemini...", run_in_background: true })`
-   - ROLE_FILE: `~/.claude/.ccg/prompts/gemini/reviewer.md`
+2. **CLAUDE 前端审查**：`Bash({ command: "...--backend CLAUDE...", run_in_background: true })`
+   - ROLE_FILE: `~/.claude/.ccg/prompts/CLAUDE/reviewer.md`
    - 需求：审查代码变更（git diff 内容）
    - OUTPUT：按 Critical/Major/Minor/Suggestion 分类列出可访问性、响应式、设计一致性问题
 
@@ -120,7 +120,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 ### 关键问题 (Critical)
 > 必须修复才能合并
-1. <问题描述> - [Codex/Gemini]
+1. <问题描述> - [Codex/CLAUDE]
 
 ### 主要问题 (Major) / 次要问题 (Minor) / 建议 (Suggestions)
 ...
@@ -135,5 +135,6 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 ## 关键规则
 
 1. **无参数 = 审查 git diff** – 自动获取当前变更
-2. **双模型交叉验证** – 后端问题以 Codex 为准，前端问题以 Gemini 为准
+2. **双模型交叉验证** – 后端问题以 Codex 为准，前端问题以 CLAUDE 为准
 3. 外部模型对文件系统**零写入权限**
+
