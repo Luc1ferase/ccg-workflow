@@ -754,6 +754,36 @@ func generateFinalOutputWithMode(results []TaskResult, summaryOnly bool) string 
 	return sb.String()
 }
 
+func resolveCodexModel() string {
+	return strings.TrimSpace(os.Getenv("CODEX_MODEL"))
+}
+
+func resolveCodexConfigOverrides() []string {
+	raw := strings.TrimSpace(os.Getenv("CODEX_CONFIG_OVERRIDES"))
+	if raw == "" {
+		return nil
+	}
+
+	parts := strings.FieldsFunc(raw, func(r rune) bool {
+		switch r {
+		case ';', '\n', '\r':
+			return true
+		default:
+			return false
+		}
+	})
+
+	result := make([]string, 0, len(parts))
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+
+	return result
+}
+
 func buildCodexArgs(cfg *Config, targetArg string) []string {
 	if cfg == nil {
 		panic("buildCodexArgs: nil config")
@@ -769,7 +799,17 @@ func buildCodexArgs(cfg *Config, targetArg string) []string {
 		}
 	}
 
-	args := []string{"e"}
+	args := []string{}
+
+	if model := resolveCodexModel(); model != "" {
+		args = append(args, "--model", model)
+	}
+
+	for _, override := range resolveCodexConfigOverrides() {
+		args = append(args, "-c", override)
+	}
+
+	args = append(args, "e")
 
 	// Default: auto-approve all operations (consistent with Gemini's -y behavior)
 	// Users can disable this by setting CODEX_REQUIRE_APPROVAL=true

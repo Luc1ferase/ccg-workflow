@@ -1,4 +1,4 @@
-import ansis from 'ansis'
+﻿import ansis from 'ansis'
 import inquirer from 'inquirer'
 import { exec, spawn } from 'node:child_process'
 import { promisify } from 'node:util'
@@ -6,6 +6,7 @@ import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'pathe'
 import fs from 'fs-extra'
+import { configCodex } from './config-codex'
 import { configMcp } from './config-mcp'
 import { i18n } from '../i18n'
 import { uninstallWorkflows } from '../utils/installer'
@@ -31,6 +32,7 @@ export async function showMainMenu(): Promise<void> {
         { name: `${ansis.blue('➜')} ${i18n.t('menu:options.update')}`, value: 'update' },
         { name: `${ansis.cyan('⚙')} 配置 MCP`, value: 'config-mcp' },
         { name: `${ansis.cyan('🔑')} 配置 API`, value: 'config-api' },
+        { name: `${ansis.cyan('🤖')} Codex args`, value: 'config-codex' },
         { name: `${ansis.magenta('🎭')} 配置输出风格`, value: 'config-style' },
         { name: `${ansis.yellow('🔧')} 实用工具`, value: 'tools' },
         { name: `${ansis.blue('📦')} 安装 Claude Code`, value: 'install-claude' },
@@ -53,6 +55,9 @@ export async function showMainMenu(): Promise<void> {
         break
       case 'config-api':
         await configApi()
+        break
+      case 'config-codex':
+        await configCodex()
         break
       case 'config-style':
         await configOutputStyle()

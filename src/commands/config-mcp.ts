@@ -260,7 +260,7 @@ async function installAceToolVariant(tool: 'ace-tool' | 'ace-tool-rs', config: {
   console.log(ansis.yellow(`⏳ 正在配置 ${tool} MCP...`))
 
   const result = await (tool === 'ace-tool-rs' ? installAceToolRs : installAceTool)({
-    baseUrl: config.baseUrl,
+    baseUrl: config.baseUrl || '',
     token: config.token,
   })
 

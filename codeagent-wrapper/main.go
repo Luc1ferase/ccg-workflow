@@ -535,6 +535,8 @@ Options:
 
 Environment Variables:
     CODEX_TIMEOUT              Timeout in milliseconds (default: 7200000)
+    CODEX_MODEL                Codex model name passed through as --model
+    CODEX_CONFIG_OVERRIDES     Semicolon/newline-separated Codex -c key=value overrides
     CODEX_REQUIRE_APPROVAL     Require manual approval for file operations (default: false)
     CODEX_DISABLE_SKIP_GIT_CHECK  Disable skip-git-repo-check flag (default: false)
     CODEAGENT_ASCII_MODE       Use ASCII symbols instead of Unicode (PASS/WARN/FAIL)

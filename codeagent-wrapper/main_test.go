@@ -1491,6 +1491,32 @@ func TestRunBuildCodexArgs_BypassSandboxEnvTrue(t *testing.T) {
 	}
 }
 
+func TestRunBuildCodexArgs_WithCodexModelAndConfigOverrides(t *testing.T) {
+	t.Setenv("CODEX_MODEL", "gpt-5.4")
+	t.Setenv("CODEX_CONFIG_OVERRIDES", "model_context_window=1000000;model_auto_compact_token_limit=900000")
+
+	cfg := &Config{Mode: "new", WorkDir: "/test/dir"}
+	args := buildCodexArgs(cfg, "my task")
+	expected := []string{
+		"--model", "gpt-5.4",
+		"-c", "model_context_window=1000000",
+		"-c", "model_auto_compact_token_limit=900000",
+		"e",
+		"--skip-git-repo-check",
+		"-C", "/test/dir",
+		"--json",
+		"my task",
+	}
+	if len(args) != len(expected) {
+		t.Fatalf("len mismatch: got %d want %d, args=%v", len(args), len(expected), args)
+	}
+	for i := range args {
+		if args[i] != expected[i] {
+			t.Fatalf("args[%d]=%s, want %s", i, args[i], expected[i])
+		}
+	}
+}
+
 func TestBackendSelectBackend(t *testing.T) {
 	tests := []struct {
 		name string
