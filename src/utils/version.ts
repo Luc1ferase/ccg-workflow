@@ -40,7 +40,7 @@ export async function getCurrentVersion(): Promise<string> {
 /**
  * Get latest version from npm registry
  */
-export async function getLatestVersion(packageName = 'ccg-workflow'): Promise<string | null> {
+export async function getLatestVersion(packageName = '@luc1ferase/ccg-workflow'): Promise<string | null> {
   try {
     const { stdout } = await execAsync(`npm view ${packageName} version`)
     return stdout.trim()

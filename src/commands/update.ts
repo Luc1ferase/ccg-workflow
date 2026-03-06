@@ -176,8 +176,8 @@ async function askReconfigureRouting(currentRouting?: ModelRouting): Promise<Mod
  */
 async function checkIfGlobalInstall(): Promise<boolean> {
   try {
-    const { stdout } = await execAsync('npm list -g ccg-workflow --depth=0', { timeout: 5000 })
-    return stdout.includes('ccg-workflow@')
+    const { stdout } = await execAsync('npm list -g @luc1ferase/ccg-workflow --depth=0', { timeout: 5000 })
+    return stdout.includes('@luc1ferase/ccg-workflow@')
   }
   catch {
     return false
@@ -209,7 +209,7 @@ async function performUpdate(fromVersion: string, toVersion: string, isNewVersio
     console.log()
     console.log('推荐的更新方式：')
     console.log()
-    console.log(ansis.cyan('  npm install -g ccg-workflow@latest'))
+    console.log(ansis.cyan('  npm install -g @luc1ferase/ccg-workflow@latest'))
     console.log()
     console.log(ansis.gray('这将同时更新命令和工作流文件'))
     console.log()
@@ -225,7 +225,7 @@ async function performUpdate(fromVersion: string, toVersion: string, isNewVersio
       console.log()
       console.log(ansis.cyan('请在新的终端窗口中运行：'))
       console.log()
-      console.log(ansis.cyan.bold('  npm install -g ccg-workflow@latest'))
+      console.log(ansis.cyan.bold('  npm install -g @luc1ferase/ccg-workflow@latest'))
       console.log()
       console.log(ansis.gray('(运行完成后，当前版本将自动更新)'))
       console.log()
@@ -265,7 +265,7 @@ async function performUpdate(fromVersion: string, toVersion: string, isNewVersio
 
     spinner.text = '正在下载最新版本...'
     // Download latest package using npx with --yes flag
-    await execAsync(`npx --yes ccg-workflow@latest --version`, { timeout: 60000 })
+    await execAsync(`npx --yes @luc1ferase/ccg-workflow@latest --version`, { timeout: 60000 })
     spinner.succeed('最新版本下载完成')
   }
   catch (error) {
@@ -335,7 +335,7 @@ async function performUpdate(fromVersion: string, toVersion: string, isNewVersio
     // Use npx to run the latest version's init command with --force flag
     // This ensures the new version's PACKAGE_ROOT is used for binary installation
     // Note: --skip-prompt preserves existing liteMode setting without asking
-    await execAsync(`npx --yes ccg-workflow@latest init --force --skip-mcp --skip-prompt`, {
+    await execAsync(`npx --yes @luc1ferase/ccg-workflow@latest init --force --skip-mcp --skip-prompt`, {
       timeout: 120000,
       env: {
         ...process.env,
@@ -359,7 +359,7 @@ async function performUpdate(fromVersion: string, toVersion: string, isNewVersio
     console.log(ansis.red(`错误: ${error}`))
     console.log()
     console.log(ansis.yellow('请尝试手动运行:'))
-    console.log(ansis.cyan('  npx ccg-workflow@latest'))
+    console.log(ansis.cyan('  npx @luc1ferase/ccg-workflow@latest'))
     return
   }
 

@@ -61,10 +61,10 @@
 
 ```bash
 # 一键安装（推荐）
-npx ccg-workflow
+npx @luc1ferase/ccg-workflow
 
 # 交互式菜单
-npx ccg-workflow menu
+npx @luc1ferase/ccg-workflow menu
 ```
 
 ### CLI 入口点
@@ -95,10 +95,10 @@ npx ccg-workflow menu
 
 | 命令 | 用途 |
 |------|------|
-| `npx ccg-workflow` | 一键安装/菜单 |
-| `npx ccg-workflow menu` | 交互式菜单 |
-| `npx ccg-workflow update` | 更新到最新版本 |
-| `npx ccg-workflow diagnose-mcp` | 诊断 MCP 配置 |
+| `npx @luc1ferase/ccg-workflow` | 一键安装/菜单 |
+| `npx @luc1ferase/ccg-workflow menu` | 交互式菜单 |
+| `npx @luc1ferase/ccg-workflow update` | 更新到最新版本 |
+| `npx @luc1ferase/ccg-workflow diagnose-mcp` | 诊断 MCP 配置 |
 
 ### Slash Commands 接口（16 个）
 
@@ -261,7 +261,7 @@ bin/
 
 ```mermaid
 graph TD
-    User["用户"] --> CLI["npx ccg-workflow"]
+    User["用户"] --> CLI["npx @luc1ferase/ccg-workflow"]
     CLI --> Init["一键安装"]
     
     Init --> Commands["~/.claude/commands/ccg/<br/>16 个命令"]

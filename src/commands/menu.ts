@@ -496,8 +496,8 @@ async function handleInstallClaude(): Promise<void> {
  */
 async function checkIfGlobalInstall(): Promise<boolean> {
   try {
-    const { stdout } = await execAsync('npm list -g ccg-workflow --depth=0', { timeout: 5000 })
-    return stdout.includes('ccg-workflow@')
+    const { stdout } = await execAsync('npm list -g @luc1ferase/ccg-workflow --depth=0', { timeout: 5000 })
+    return stdout.includes('@luc1ferase/ccg-workflow@')
   }
   catch {
     return false
@@ -577,7 +577,7 @@ async function uninstall(): Promise<void> {
       console.log()
       console.log('请在新的终端窗口中运行：')
       console.log()
-      console.log(ansis.cyan.bold('  npm uninstall -g ccg-workflow'))
+      console.log(ansis.cyan.bold('  npm uninstall -g @luc1ferase/ccg-workflow'))
       console.log()
       console.log(ansis.gray('(完成后 ccg 命令将彻底移除)'))
     }

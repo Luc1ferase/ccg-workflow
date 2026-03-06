@@ -1,11 +1,22 @@
 {
-  "name": "ccg-workflow",
+  "name": "@luc1ferase/ccg-workflow",
   "version": "1.7.65",
   "description": "Claude-Codex 双模型协作系统 - 智能路由开发工作流",
   "type": "module",
   "packageManager": "pnpm@10.17.1",
   "author": {
-    "name": "CCG Contributors"
+    "name": "Luc1ferase"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Luc1ferase/ccg-workflow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Luc1ferase/ccg-workflow/issues"
+  },
+  "homepage": "https://github.com/Luc1ferase/ccg-workflow#readme",
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT",
   "keywords": [
